@@ -21,7 +21,7 @@
 //   indicating pass/bless or turn solid red indicating fail/no blessing
 // - Any configured webhooks will then be notified of the blessing event and take further actions
 
-#require "FactoryTools:1.0.0"
+#require "FactoryTools.device.nut:1.0.0"
 
 // CONSTS AND GLOBALS ---------------------------------------------------------
 
