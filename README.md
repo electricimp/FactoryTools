@@ -7,7 +7,7 @@ These utilities are provided to simplify building and maintaining factory firmwa
 Simple require this library in order to gain access to the methods listed below. Methods are namespaced to "FactoryTools".
 
 ```Squirrel
-require "FactoryTools.device.nut:1.0.0"
+#require "FactoryTools.device.nut:1.0.0"
 ```
 
 ## Methods
