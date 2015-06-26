@@ -35,7 +35,7 @@ function sendFactoryBlinkUp() {
     imp.wakeup(BLINKUP_INTERVAL_SECONDS, sendFactoryBlinkUp);
     // Use the BLINKUP_ACTIVEHIGH flag if the LED turns on when the LED pin is driven high
     // Otherwise, Active-Low is assumed (LED on when LED pin is driven low)
-    server.factoryblinkup(SSID, PASSWORD, led, 0);
+    server.factoryblinkup(SSID, PASSWORD, led, BLINKUP_ACTIVEHIGH);
 }
 
 function configureFactoryFixture() {
