@@ -28,12 +28,12 @@ if (FactoryTools.isFactoryFirmware()) {
 #### isFactoryImp()
 Supported on the Device and Agent.
 
-Returns `true` if imp is designated as a Factory Fixture, `false` otherwise. This method is intended to make it easy to determine whether to follow the **Factory Fixture flow** or **Device Under Test flow** in your Factory Firmware.
+Returns `true` if imp is designated as a Factory Fixture, `false` otherwise. This method is intended to make it easy to determine whether to follow the *Factory Fixture flow* or *Device Under Test flow* in your Factory Firmware.
 
 #### isDeviceUnderTest()
 Supported on the Device and Agent.
 
-Returns `true` if imp is not configured as the Factory Fixture, `false` otherwise.  This method is intended to make it easy to determine whether to follow the **Factory Fixture flow** or **Device Under Test flow** in your Factory Firmware.
+Returns `true` if imp is not configured as the Factory Fixture, `false` otherwise.  This method is intended to make it easy to determine whether to follow the *Factory Fixture flow* or *Device Under Test flow* in your Factory Firmware.
 
 ```Squirrel
 if (FactoryTools.isFactoryImp()) {
@@ -48,7 +48,7 @@ if (FactoryTools.isFactoryImp()) {
 #### getFactoryFixtureURL()
 Supported on the Agent *only*.  If called on the Device this method will return `null`.
 
-On the Agent of the **Device Under Test** this method returns the Factory Fixture's agent URL.  Returns `null` otherwise.  You can use the Factory Fixture's agent URL to send information about the Device Under Test to the Factory Fixture using an HTTP request.
+On the **Agent of the Device Under Test** this method returns the Factory Fixture's agent URL.  Returns `null` otherwise.  You can use the Factory Fixture's agent URL to send information about the Device Under Test to the Factory Fixture using an HTTP request.
 
 ```Squirrel
 device.on("testresult", function(result) {
