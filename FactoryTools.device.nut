@@ -1,12 +1,12 @@
-// Copyright (C) 2015 Electric Imp, Inc
- 
-// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files 
+// Copyright (C) 2015-16 Electric Imp, Inc
+
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files
 // (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge,
 // publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do
 // so, subject to the following conditions:
- 
+
 // The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
- 
+
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
 // FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
@@ -14,29 +14,54 @@
 
 // FACTORY TOOLS LIBRARY ------------------------------------------------------
 
-class FactoryTools {   
+class FactoryTools {
+
+    static version = [1,1,1];
+
+    /**
+    * Factory Device: @return {bool} - 'true' or 'false'
+    * Factory Agent: @return {null} - 'null'
+    */
     static function isFactoryFirmware() {
-        if ("factoryfirmware" in imp.configparams && imp.configparams["factoryfirmware"]) {
-            return true;
-        }
-        return false;
+        // this info is not availible to factory agents
+        if ( _isAgent() ) return null;
+        return ("factoryfirmware" in imp.configparams && imp.configparams["factoryfirmware"]);
     }
 
+    /**
+    * @return {bool}
+    */
     static function isFactoryImp() {
-        if (isFactoryFirmware()) {
-            if ("factory_imp" in imp.configparams) {
-                if (imp.configparams["factory_imp"] == imp.getmacaddress()) {
-                    return true;
-                }
-            }
+        if ( _isAgent() ) {
+            return ( !getFactoryFixtureURL() );
+        } else {
+            return ( isFactoryFirmware() && "factory_imp" in imp.configparams && imp.configparams.factory_imp == imp.getmacaddress() );
         }
-        return false;
     }
 
+    /**
+    * @return {bool}
+    */
     static function isDeviceUnderTest() {
-        if (isFactoryFirmware() && !isFactoryImp()) {
-            return true;
+        if ( _isAgent() ) {
+            return (typeof getFactoryFixtureURL() == "string");
+        } else {
+            return (isFactoryFirmware() && !isFactoryImp());
         }
-        return false;
+    }
+
+    /**
+    * Factory Device: @return {null}
+    * Factory Agent: @return {null | string} - if in Device Under Test agent the Factory Fixture agent URL is returned, otherwise null
+    */
+    static function getFactoryFixtureURL() {
+        return ("factory_fixture_url" in imp.configparams) ? imp.configparams.factory_fixture_url : null;
+    }
+
+    /**
+    * @return {bool}
+    */
+    function _isAgent() {
+        return (imp.environment() == ENVIRONMENT_AGENT);
     }
 }
