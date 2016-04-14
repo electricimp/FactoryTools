@@ -26,12 +26,9 @@ class FactoryTools {
     static version = [1,1,1];
 
     /**
-    * Factory Device: @return {bool} - 'true' or 'false'
-    * Factory Agent: @return {null} - 'null'
+    * @return {bool} - 'true' or 'false'
     */
     static function isFactoryFirmware() {
-        // this info is not availible to factory agents
-        if ( _isAgent() ) return null;
         return ("factoryfirmware" in imp.configparams && imp.configparams["factoryfirmware"]);
     }
 
@@ -40,7 +37,7 @@ class FactoryTools {
     */
     static function isFactoryImp() {
         if ( _isAgent() ) {
-            return ( !getFactoryFixtureURL() );
+            return ( isFactoryFirmware() && !getFactoryFixtureURL() );
         } else {
             return ( isFactoryFirmware() && "factory_imp" in imp.configparams && imp.configparams.factory_imp == imp.getmacaddress() );
         }
@@ -51,7 +48,7 @@ class FactoryTools {
     */
     static function isDeviceUnderTest() {
         if ( _isAgent() ) {
-            return (typeof getFactoryFixtureURL() == "string");
+            return (isFactoryFirmware() && typeof getFactoryFixtureURL() == "string");
         } else {
             return (isFactoryFirmware() && !isFactoryImp());
         }

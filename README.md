@@ -13,9 +13,9 @@ Simply require this library on both your device and agent side code in order to 
 ## Methods
 
 #### isFactoryFirmware()
-Supported on the Device *only*.  If called on the Agent this method will return `null`.
+Supported on the Device and Agent.
 
-On the Device this method returns `true` if firmware is running in the factory environment, `false` otherwise. Please note both Factory Fixtures and Devices Under Test (configured via Factory BlinkUp from a Factory Fixture) will return `true`.
+Returns `true` if firmware is running in the factory environment, `false` otherwise. Please note both Factory Fixtures and Devices Under Test (configured via Factory BlinkUp from a Factory Fixture) will return `true`.
 
 ```Squirrel
 if (FactoryTools.isFactoryFirmware()) {
