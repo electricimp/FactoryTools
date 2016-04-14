@@ -1,4 +1,4 @@
-#Factory Fixture with Factory Agent Example
+#Factory Code with Factory Agent Example
 
 ##This Example shows how to
 * Use the Factory Tools library to determine if we are running in a factory environment.
