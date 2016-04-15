@@ -1,19 +1,22 @@
 # Factory Tools Library
 
-These utilities are provided to simplify building and maintaining factory firmware. 
+These utilities are provided to simplify building and maintaining factory firmware.
 
 ## Usage
 
-Simple require this library in order to gain access to the methods listed below. Methods are namespaced to "FactoryTools".
+Simply `#require` this library on either your device or agent side code in order to gain access to the methods listed below. Methods are namespaced to "FactoryTools".
 
 ```Squirrel
-#require "FactoryTools.device.nut:1.0.0"
+#require "FactoryTools.class.nut:1.1.1"
 ```
 
 ## Methods
 
-#### *bool* isFactoryFirmware(*none*)
-Returns true if this firmware is running in the factory environment, false otherwise. Factory fixtures and Devices Under Test (configured via Factory BlinkUp from a Factory Fixture) will both receive "true" from this method.
+### isFactoryFirmware()
+
+Supported on the device and agent.
+
+Returns `true` if firmware is running in the factory environment, `false` otherwise. Please note both factory BlinkUp fixtures and devices under test (configured via factory BlinkUp from a factory BlinkUp fixture) will return `true`.
 
 ```Squirrel
 if (FactoryTools.isFactoryFirmware()) {
@@ -23,21 +26,54 @@ if (FactoryTools.isFactoryFirmware()) {
 }
 ```
 
-#### *bool* isFactoryImp(*none*)
-Returns true if this device is designated as a Factory Imp, false otherwise. This method is intended to make it easy to determine whether to follow the Factory Fixture flow or Device Under Test flow in your Factory Firmware.
+### isFactoryImp()
+
+Supported on the device and agent.
+
+Returns `true` if the imp is designated as a factory BlinkUp fixture, `false` otherwise. This method is intended to make it easy to determine whether to follow the *factory fixture flow* or *device under test flow* in your factory firmware.
+
+### isDeviceUnderTest()
+
+Supported on the device and agent.
+
+Returns `true` if the imp is not configured as the factory BlinkUp fixture, `false` otherwise. This method is intended to make it easy to determine whether to follow the *factory fixture flow* or *device under test flow* in your factory firmware.
 
 ```Squirrel
 if (FactoryTools.isFactoryImp()) {
-	configureFactoryImp();
-} else if (FactoryTools.isDeviceUnderTest()) { 
-	configureDeviceUnderTest();
+  configureFactoryImp();
+} else if (FactoryTools.isDeviceUnderTest()) {
+  configureDeviceUnderTest();
 } else {
-	server.log("Not running in Factory Environment");
+  server.log("Not running in Factory Environment");
 }
 ```
 
-#### *bool* isDeviceUnderTest(*none*) 
-Returns true if this device is running Factory Firmware, but is not configured as the Factory Imp. Returns false otherwise. 
+### getFactoryFixtureURL()
+
+Supported on the agent *only*. If called on the device this method will return `null`.
+
+On the **agent of the device under test** this method returns the factory BlinkUp fixture’s agent URL. It returns `null` otherwise. You can use this agent URL to send information about the device under test to the factory BlinkUp fixture using an HTTP request.
+
+```Squirrel
+device.on("testresult", function(result) {
+    local fixtureAgentURL = FactoryTools.getFactoryFixtureURL();
+
+    if (fixtureAgentURL == null) {
+        server.error("Factory Fixture URL not available.");
+    } else {
+        local headers = {"Content-Type" : "application/json"};
+        local body = http.jsonencode(result.deviceInfo);
+        local request = http.post(fixtureAgentURL, headers, body);
+        local response = request.sendsync();
+
+        if (response.statuscode != 200) {
+            server.error("Problem contacting Factory Fixture.");
+        } else {
+            server.log("Factory Fixture confirmed receipt of device info.");
+        }
+    }
+});
+```
 
 ## License
 
