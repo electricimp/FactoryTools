@@ -7,7 +7,7 @@ These utilities are provided to simplify building and maintaining factory firmwa
 Simply `#require` this library on either your device or agent side code in order to gain access to the methods listed below. Methods are namespaced to "FactoryTools".
 
 ```Squirrel
-#require "FactoryTools.class.nut:1.1.1"
+#require "FactoryTools.class.nut:2.0.0"
 ```
 
 ## Methods
@@ -52,15 +52,13 @@ if (FactoryTools.isFactoryImp()) {
 
 Supported on the agent *only*. If called on the device this method will return `null`.
 
-On the **agent of the device under test** this method returns the factory BlinkUp fixture’s agent URL. It returns `null` otherwise. You can use this agent URL to send information about the device under test to the factory BlinkUp fixture using an HTTP request.
+If firmware is running in the factory environment on an agent this method returns the factory BlinkUp fixture’s agent URL. It returns `null` otherwise. You can use this agent URL to send information about the device under test to the factory BlinkUp fixture using an HTTP request.
 
 ```Squirrel
 device.on("testresult", function(result) {
     local fixtureAgentURL = FactoryTools.getFactoryFixtureURL();
 
-    if (fixtureAgentURL == null) {
-        server.error("Factory Fixture URL not available.");
-    } else {
+    if ( FactoryTools.isDeviceUnderTest() && fixtureAgentURL) {
         local headers = {"Content-Type" : "application/json"};
         local body = http.jsonencode(result.deviceInfo);
         local request = http.post(fixtureAgentURL, headers, body);
