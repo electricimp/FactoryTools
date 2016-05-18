@@ -18,12 +18,12 @@
 * @author Tony Smith <tony@electricimp.com>
 * @author Elizabeth Rhodes <betsy@electricimp.com>
 *
-* version 1.1.1
+* version 2.0.0
 */
 
 class FactoryTools {
 
-    static version = [1,1,1];
+    static version = [2,0,0];
 
     /**
     * @return {bool} - 'true' or 'false'
@@ -37,7 +37,7 @@ class FactoryTools {
     */
     static function isFactoryImp() {
         if ( _isAgent() ) {
-            return ( isFactoryFirmware() && !getFactoryFixtureURL() );
+            return ( isFactoryFirmware() && !isDeviceUnderTest() );
         } else {
             return ( isFactoryFirmware() && "factory_imp" in imp.configparams && imp.configparams.factory_imp == imp.getmacaddress() );
         }
@@ -48,7 +48,7 @@ class FactoryTools {
     */
     static function isDeviceUnderTest() {
         if ( _isAgent() ) {
-            return (isFactoryFirmware() && typeof getFactoryFixtureURL() == "string");
+            return (isFactoryFirmware() && "factory_fixture_url" in imp.configparams);
         } else {
             return (isFactoryFirmware() && !isFactoryImp());
         }
@@ -56,10 +56,15 @@ class FactoryTools {
 
     /**
     * Factory Device: @return {null}
-    * Factory Agent: @return {null | string} - if in Device Under Test agent the Factory Fixture agent URL is returned, otherwise null
+    * Factory Agent: @return {null | string} - if in factory environment the Factory Fixture agent URL is returned, otherwise null
     */
     static function getFactoryFixtureURL() {
-        return ("factory_fixture_url" in imp.configparams) ? imp.configparams.factory_fixture_url : null;
+        if ( isFactoryFirmware() && _isAgent() ) {
+            return ("factory_fixture_url" in imp.configparams) ? imp.configparams.factory_fixture_url : http.agenturl();
+        } else {
+            return null;
+        }
+
     }
 
     /**

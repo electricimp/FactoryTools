@@ -1,7 +1,7 @@
 // Factory Fixture Display Driver
 #require "CFAx33KL.class.nut:1.0.1"
 // Factory Tools Utility Library
-#require "FactoryTools.class.nut:1.1.1"
+#require "FactoryTools.class.nut:2.0.0"
 // LED Driver
 #require "WS2812.class.nut:2.0.1"
 

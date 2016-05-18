@@ -1,5 +1,5 @@
 // Factory Tools Utility Library
-#require "FactoryTools.class.nut:1.1.1"
+#require "FactoryTools.class.nut:2.0.0"
 
 
 // SHARED SETUP
@@ -117,12 +117,12 @@ if (FactoryTools.isFactoryFirmware()) {
     server.log("This agent is running factory firmware");
 
     // Run Class Code for Specified Device
-    if (factoryTools.isFactoryImp()) {
+    if (FactoryTools.isFactoryImp()) {
         server.log("Its device is a BlinkUp fixture");
         BootFactoryFixtureAgent();
     }
 
-    if (factoryTools.isDeviceUnderTest()) {
+    if (FactoryTools.isDeviceUnderTest()) {
         server.log("Its device is a production unit");
         BootDeviceUnderTestAgent();
     }
