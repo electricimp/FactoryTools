@@ -52,13 +52,13 @@ if (FactoryTools.isFactoryImp()) {
 
 Supported on the agent *only*. If called on the device this method will return `null`.
 
-If firmware is running in the factory environment on an agent this method returns the factory BlinkUp fixture’s agent URL. It returns `null` otherwise. You can use this agent URL to send information about the device under test to the factory BlinkUp fixture using an HTTP request.
+If the firmware is running as within the factory environment as an agent, this method returns the factory BlinkUp fixture’s agent URL. It returns `null` otherwise. You can use this agent URL to send information about the device under test to the factory BlinkUp fixture using an HTTP request.
 
 ```Squirrel
 device.on("testresult", function(result) {
     local fixtureAgentURL = FactoryTools.getFactoryFixtureURL();
 
-    if ( FactoryTools.isDeviceUnderTest() && fixtureAgentURL) {
+    if (FactoryTools.isDeviceUnderTest() && fixtureAgentURL) {
         local headers = {"Content-Type" : "application/json"};
         local body = http.jsonencode(result.deviceInfo);
         local request = http.post(fixtureAgentURL, headers, body);
