@@ -10,6 +10,8 @@ Simply `#require` this library on either your device or agent side code in order
 #require "FactoryTools.class.nut:2.0.1"
 ```
 
+**Note** FactoryTools currently sets the imp’s [timeout policy](https://electricimp.com/docs/api/server/setsendtimeoutpolicy/) to *SUSPEND_ON_ERROR*. If your application requires the *RETURN_ON_ERROR*, you must set this in your code **after** the first call to a FactoryTools method.
+
 ## Methods
 
 ### isFactoryFirmware()
