@@ -81,13 +81,10 @@ class FactoryTools {
 
     function _startDelay() {
         // Server policy setting and subsequent server.log() call pauses Squirrel
-        // during server comms and causes imp.configparams to be populated. Flag
-        // ensures we only run this on the first call
-        server.setsendtimeout(SUSPEND_ON_ERROR, WAIT_FOR_ACK, 30);
-        server.log("FactoryTools initializing...");
-
-        // Restore default timeout policy
+        // during server comms (which forces imp.configparams to be populated).
+        // Flag ensures we only run this on the first call
         server.setsendtimeout(SUSPEND_ON_ERROR, WAIT_TIL_SENT, 30);
+        server.log("FactoryTools initializing...");
         _startFlag = false;
     }
 }
