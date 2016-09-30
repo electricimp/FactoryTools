@@ -7,7 +7,7 @@ These utilities are provided to simplify building and maintaining factory firmwa
 Simply `#require` this library on either your device or agent side code in order to gain access to the methods listed below. Methods are namespaced to "FactoryTools".
 
 ```Squirrel
-#require "FactoryTools.class.nut:2.0.0"
+#require "FactoryTools.class.nut:2.0.1"
 ```
 
 ## Methods

@@ -18,17 +18,20 @@
 * @author Tony Smith <tony@electricimp.com>
 * @author Elizabeth Rhodes <betsy@electricimp.com>
 *
-* version 2.0.0
+* version 2.0.1
 */
 
 class FactoryTools {
 
-    static version = [2,0,0];
+    static version = [2,0,1];
+
+    _startFlag = true;
 
     /**
     * @return {bool} - 'true' or 'false'
     */
     static function isFactoryFirmware() {
+        if (_startFlag) _startDelay();
         return ("factoryfirmware" in imp.configparams && imp.configparams["factoryfirmware"]);
     }
 
@@ -39,6 +42,7 @@ class FactoryTools {
         if ( _isAgent() ) {
             return ( isFactoryFirmware() && !isDeviceUnderTest() );
         } else {
+            if (_startFlag) _startDelay();
             return ( isFactoryFirmware() && "factory_imp" in imp.configparams && imp.configparams.factory_imp == imp.getmacaddress() );
         }
     }
@@ -50,6 +54,7 @@ class FactoryTools {
         if ( _isAgent() ) {
             return (isFactoryFirmware() && "factory_fixture_url" in imp.configparams);
         } else {
+            if (_startFlag) _startDelay();
             return (isFactoryFirmware() && !isFactoryImp());
         }
     }
@@ -72,5 +77,17 @@ class FactoryTools {
     */
     function _isAgent() {
         return (imp.environment() == ENVIRONMENT_AGENT);
+    }
+
+    function _startDelay() {
+        // Server policy setting and subsequent server.log() call pauses Squirrel
+        // during server comms and causes imp.configparams to be populated. Flag
+        // ensures we only run this on the first call
+        server.setsendtimeout(SUSPEND_ON_ERROR, WAIT_FOR_ACK, 30);
+        server.log("FactoryTools initializing...");
+
+        // Restore default timeout policy
+        server.setsendtimeout(SUSPEND_ON_ERROR, WAIT_TIL_SENT, 30);
+        _startFlag = false;
     }
 }
