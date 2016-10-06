@@ -25,13 +25,11 @@ class FactoryTools {
 
     static version = [2,0,1];
 
-    _startFlag = true;
-
     /**
     * @return {bool} - 'true' or 'false'
     */
     static function isFactoryFirmware() {
-        if (_startFlag) _startDelay();
+        _startDelay();
         return ("factoryfirmware" in imp.configparams && imp.configparams["factoryfirmware"]);
     }
 
@@ -42,7 +40,7 @@ class FactoryTools {
         if ( _isAgent() ) {
             return ( isFactoryFirmware() && !isDeviceUnderTest() );
         } else {
-            if (_startFlag) _startDelay();
+            _startDelay();
             return ( isFactoryFirmware() && "factory_imp" in imp.configparams && imp.configparams.factory_imp == imp.getmacaddress() );
         }
     }
@@ -54,7 +52,7 @@ class FactoryTools {
         if ( _isAgent() ) {
             return (isFactoryFirmware() && "factory_fixture_url" in imp.configparams);
         } else {
-            if (_startFlag) _startDelay();
+            _startDelay();
             return (isFactoryFirmware() && !isFactoryImp());
         }
     }
@@ -83,8 +81,10 @@ class FactoryTools {
         // Server policy setting and subsequent server.log() call pauses Squirrel
         // during server comms (which forces imp.configparams to be populated).
         // Flag ensures we only run this on the first call
-        server.setsendtimeout(SUSPEND_ON_ERROR, WAIT_TIL_SENT, 30);
-        server.log("FactoryTools initializing...");
-        _startFlag = false;
+        if (!_isAgent()) {
+            server.setsendtimeoutpolicy(SUSPEND_ON_ERROR, WAIT_FOR_ACK, 30);
+            server.log("FactoryTools running...");
+            server.setsendtimeoutpolicy(SUSPEND_ON_ERROR, WAIT_TIL_SENT, 30);
+        }
     }
 }
