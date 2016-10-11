@@ -18,18 +18,17 @@
 * @author Tony Smith <tony@electricimp.com>
 * @author Elizabeth Rhodes <betsy@electricimp.com>
 *
-* version 2.0.1
+* version 2.1.0
 */
 
 class FactoryTools {
 
-    static version = [2,0,1];
+    static version = [2,1,0];
 
     /**
     * @return {bool} - 'true' or 'false'
     */
     static function isFactoryFirmware() {
-        _startDelay();
         return ("factoryfirmware" in imp.configparams && imp.configparams["factoryfirmware"]);
     }
 
@@ -37,11 +36,26 @@ class FactoryTools {
     * @return {bool}
     */
     static function isFactoryImp() {
-        if ( _isAgent() ) {
-            return ( isFactoryFirmware() && !isDeviceUnderTest() );
+        if (_isAgent()) {
+            return (isFactoryFirmware() && !isDeviceUnderTest());
         } else {
-            _startDelay();
-            return ( isFactoryFirmware() && "factory_imp" in imp.configparams && imp.configparams.factory_imp == imp.getmacaddress() );
+            return (isFactoryFirmware() && "factory_imp" in imp.configparams && imp.configparams.factory_imp == imp.getmacaddress());
+        }
+    }
+
+    /*
+    * Asynchronous version
+    * callback -> function(bool) { . . . }
+    */
+
+    static function onFactoryImp(callback) {
+        if (_isAgent()) {
+            callback(isFactoryFirmware() && !isDeviceUnderTest());
+        } else {
+            imp.onidle(function() {
+                imp.onidle(null);
+                callback(isFactoryFirmware() && "factory_imp" in imp.configparams && imp.configparams.factory_imp == imp.getmacaddress());
+            }.bindenv(this));
         }
     }
 
@@ -49,11 +63,26 @@ class FactoryTools {
     * @return {bool}
     */
     static function isDeviceUnderTest() {
-        if ( _isAgent() ) {
+        if (_isAgent()) {
             return (isFactoryFirmware() && "factory_fixture_url" in imp.configparams);
         } else {
-            _startDelay();
             return (isFactoryFirmware() && !isFactoryImp());
+        }
+    }
+
+    /*
+    * Asynchronous version
+    * callback -> function(bool) { . . . }
+    */
+
+    static function onDeviceUnderTest(callback) {
+        if (_isAgent()) {
+            callback(isFactoryFirmware() && "factory_fixture_url" in imp.configparams);
+        } else {
+            imp.onidle(function() {
+                imp.onidle(null);
+                callback(isFactoryFirmware() && !isFactoryImp());
+            }.bindenv(this));
         }
     }
 
@@ -75,16 +104,5 @@ class FactoryTools {
     */
     function _isAgent() {
         return (imp.environment() == ENVIRONMENT_AGENT);
-    }
-
-    function _startDelay() {
-        // Server policy setting and subsequent server.log() call pauses Squirrel
-        // during server comms (which forces imp.configparams to be populated).
-        // Flag ensures we only run this on the first call
-        if (!_isAgent()) {
-            server.setsendtimeoutpolicy(SUSPEND_ON_ERROR, WAIT_FOR_ACK, 30);
-            server.log("FactoryTools running...");
-            server.setsendtimeoutpolicy(SUSPEND_ON_ERROR, WAIT_TIL_SENT, 30);
-        }
     }
 }
