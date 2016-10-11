@@ -96,7 +96,6 @@ class FactoryTools {
         } else {
             return null;
         }
-
     }
 
     /**

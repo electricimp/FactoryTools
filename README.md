@@ -18,6 +18,8 @@ To avoid this issue, you should make use of Factory Tools 2.1.0’s new asynchro
 
 In each case, embed your factor imp set-up flow and DUT test flow within the callbacks to ensure these flows are actioned correctly. An example is given in the method descriptions below. It also demonstrated in the accompanying example, `Async.factory.device.nut`.
 
+**Important Note** Factory devices may warm-start outside of factory firmware control as outlined above. If fresh factory firmware is deployed during production, devices will receive the new code and automatically restart to run the new code. We strongly recommend all users of Factory Tools take advantage of the asynchronous methods to manage this situation.
+
 ## Methods
 
 ### isFactoryFirmware()
