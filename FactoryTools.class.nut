@@ -28,61 +28,62 @@ class FactoryTools {
     /**
     * @return {bool} - 'true' or 'false'
     */
-    static function isFactoryFirmware() {
-        return ("factoryfirmware" in imp.configparams && imp.configparams["factoryfirmware"]);
-    }
-
-    /**
-    * @return {bool}
-    */
-    static function isFactoryImp() {
-        if (_isAgent()) {
-            return (isFactoryFirmware() && !isDeviceUnderTest());
+    static function isFactoryFirmware(callback = null) {
+        if (callback) {
+            if (_isAgent()) {
+                callback("factoryfirmware" in imp.configparams && imp.configparams["factoryfirmware"]);
+            } else {
+                imp.onidle(function() {
+                    imp.onidle(null);
+                    callback("factoryfirmware" in imp.configparams && imp.configparams["factoryfirmware"]);
+                }.bindenv(this));
+            }
         } else {
-            return (isFactoryFirmware() && "factory_imp" in imp.configparams && imp.configparams.factory_imp == imp.getmacaddress());
-        }
-    }
-
-    /*
-    * Asynchronous version
-    * callback -> function(bool) { . . . }
-    */
-
-    static function onFactoryImp(callback) {
-        if (_isAgent()) {
-            callback(isFactoryFirmware() && !isDeviceUnderTest());
-        } else {
-            imp.onidle(function() {
-                imp.onidle(null);
-                callback(isFactoryFirmware() && "factory_imp" in imp.configparams && imp.configparams.factory_imp == imp.getmacaddress());
-            }.bindenv(this));
+            return ("factoryfirmware" in imp.configparams && imp.configparams["factoryfirmware"]);
         }
     }
 
     /**
     * @return {bool}
     */
-    static function isDeviceUnderTest() {
+    static function isFactoryImp(callback = null) {
         if (_isAgent()) {
-            return (isFactoryFirmware() && "factory_fixture_url" in imp.configparams);
+            if (callback) {
+                callback(isFactoryFirmware() && !isDeviceUnderTest());
+            } else {
+                return (isFactoryFirmware() && !isDeviceUnderTest());
+            }
         } else {
-            return (isFactoryFirmware() && !isFactoryImp());
+            if (callback) {
+                imp.onidle(function() {
+                    imp.onidle(null);
+                    callback(isFactoryFirmware() && "factory_imp" in imp.configparams && imp.configparams.factory_imp == imp.getmacaddress());
+                }.bindenv(this));
+            } else {
+                return (isFactoryFirmware() && "factory_imp" in imp.configparams && imp.configparams.factory_imp == imp.getmacaddress());
+            }
         }
     }
 
-    /*
-    * Asynchronous version
-    * callback -> function(bool) { . . . }
+    /**
+    * @return {bool}
     */
-
-    static function onDeviceUnderTest(callback) {
+    static function isDeviceUnderTest(callback = null) {
         if (_isAgent()) {
-            callback(isFactoryFirmware() && "factory_fixture_url" in imp.configparams);
+            if (callback) {
+                callback(isFactoryFirmware() && "factory_fixture_url" in imp.configparams);
+            } else {
+                return (isFactoryFirmware() && "factory_fixture_url" in imp.configparams);
+            }
         } else {
-            imp.onidle(function() {
-                imp.onidle(null);
-                callback(isFactoryFirmware() && !isFactoryImp());
-            }.bindenv(this));
+            if (callback) {
+                imp.onidle(function() {
+                    imp.onidle(null);
+                    callback(isFactoryFirmware() && !isFactoryImp());
+                }.bindenv(this));
+            } else {
+                return (isFactoryFirmware() && !isFactoryImp());
+            }
         }
     }
 
@@ -91,11 +92,13 @@ class FactoryTools {
     * Factory Agent: @return {null | string} - if in factory environment the Factory Fixture agent URL is returned, otherwise null
     */
     static function getFactoryFixtureURL() {
-        if ( isFactoryFirmware() && _isAgent() ) {
-            return ("factory_fixture_url" in imp.configparams) ? imp.configparams.factory_fixture_url : http.agenturl();
-        } else {
-            return null;
+        if (_isAgent()) {
+            if (isFactoryFirmware()) {
+                return ("factory_fixture_url" in imp.configparams) ? imp.configparams.factory_fixture_url : http.agenturl();
+            }
         }
+
+        return null;
     }
 
     /**

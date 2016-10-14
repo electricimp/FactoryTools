@@ -14,19 +14,21 @@ Simply `#require` this library on either your device or agent side code in order
 
 If your factory firmware puts production devices under test into deep sleep, when the devices awake (ie. perform a warm start) they will immediately begin re-running the factory firmware. This is standard imp wake-from-sleep behavior. Unfortunately, this also means that you factory firmware may call the Factory Tools methods before the device has received the information from the server it needs to be able to return valid data via the Factory Tools methods. The factory firmware will erroneously believe that it is not running in a factory environment.
 
-To avoid this issue, you should make use of Factory Tools 2.1.0’s new asynchronous methods: *onFactoryImp()* and *onDeviceUnderTest()*. These register a callback function with a single parameter, *result*, into which the answer to question posed by the synchronous version of the method is placed. For example, the callback registered with *onFactoryImp()* will receive `true` if the device is a factory imp, or `false` if it is a device under test.
+To avoid this issue, you should make use of Factory Tools 2.1.0’s new support for asynchronous operation. The methods *isFactoryFirmware()*, *isFactoryImp()* and *isDeviceUnderTest()* can now take an optional callback function with a single parameter, *result*, into which the boolean answer is placed. For example, a callback registered with *isFactoryImp()* will receive `true` if the device is a factory imp, or `false` if it is a device under test.
 
 In each case, embed your factor imp set-up flow and DUT test flow within the callbacks to ensure these flows are actioned correctly. An example is given in the method descriptions below. It also demonstrated in the accompanying example, `Async.factory.device.nut`.
+
+You only need employ asynchronous operation on **the first call** to one of Factory Tools’ methods. Once the first callback has been executed, you can be sure the status information is present, and all other calls can be made synchronously without penalty.
 
 **Important Note** Factory devices may warm-start outside of factory firmware control as outlined above. If fresh factory firmware is deployed during production, devices will receive the new code and automatically restart to run the new code. We strongly recommend all users of Factory Tools take advantage of the asynchronous methods to manage this situation.
 
 ## Methods
 
-### isFactoryFirmware()
+### isFactoryFirmware(*[callback]*)
 
 Supported on the device and agent.
 
-Returns `true` if firmware is running in the factory environment, `false` otherwise. Please note both factory BlinkUp fixtures and devices under test (configured via factory BlinkUp from a factory BlinkUp fixture) will return `true`.
+If no callback is provided, the method returns `true` if firmware is running in the factory environment, `false` otherwise. Both factory BlinkUp fixtures and devices under test (configured via factory BlinkUp from a factory BlinkUp fixture) will return `true`.
 
 ```Squirrel
 if (FactoryTools.isFactoryFirmware()) {
@@ -36,72 +38,61 @@ if (FactoryTools.isFactoryFirmware()) {
 }
 ```
 
-### isFactoryImp()
+If a callback is provided, the function will be called when the device has received the required status information. The callback takes a single parameter, *result*, which will be `true` if firmware is running in the factory environment, otherwise `false`.
 
-Supported on the device and agent.
+This method can also be used in your factory agent; the callback will simply be invoked immediately.
 
-Returns `true` if the imp is designated as a factory BlinkUp fixture, `false` otherwise. This method is intended to make it easy to determine whether to follow the *factory fixture flow* or *device under test flow* in your factory firmware.
+### isFactoryImp(*[callback]*)
 
-### onFactoryImp(*callback*)
+Supported on the device and agent. This method is intended to make it easy to determine whether to follow the *factory fixture flow* or *device under test flow* in your factory firmware.
 
-This method registers a function which will be called when the device has received the required status information and is able to verify the host device’s type. The callback takes a single parameter, *result*, which will be `true` if the device is a factory imp, otherwise `false`.
+If no callback is provided, this method returns `true` if the imp is designated as a factory BlinkUp fixture, `false` otherwise.
+
+If a callback is provided, the function will be called when the device has received the required status information and is able to verify the host device’s type. The callback takes a single parameter, *result*, which will be `true` if the device is a factory imp, otherwise `false`.
 
 This method can also be used in your factory agent; the callback will simply be invoked immediately.
 
 ```squirrel
-FactoryTools.onFactoryImp(function(isBlinkUpBox) {
+FactoryTools.isFactoryImp(function(isBlinkUpBox) {
     if (isBlinkUpBox) {
         // Device is a factory imp
         configureFactoryImp();
     } else {
-        FactoryTools.onDeviceUnderTest(function(isDUT) {
-            if (isDUT) {
-                // Device is a production unit - test it
-                testDeviceUnderTest();
-            } else {
-                server.log("Not running in Factory Environment");
-            }
-        });
+        // The next call need not be asynchronous since we can be sure
+        // at this point (we're executing in a callback) that the status
+        // data has been acquired
+        if (FactoryTools.isDeviceUnderTest()) {
+            // Device is a production unit - test it
+            testDeviceUnderTest();
+        } else {
+            server.log("Not running in Factory Environment");
+        }
     }
 });
 ```
 
-### isDeviceUnderTest()
+### isDeviceUnderTest(*[callback]*)
 
-Supported on the device and agent.
+Supported on the device and agent. This method is intended to make it easy to determine whether to follow the *factory fixture flow* or *device under test flow* in your factory firmware.
 
-Returns `true` if the imp is not configured as the factory BlinkUp fixture, `false` otherwise. This method is intended to make it easy to determine whether to follow the *factory fixture flow* or *device under test flow* in your factory firmware.
+If no callback is provided, this method returns `true` if the imp is not configured as the factory BlinkUp fixture, `false` otherwise.
 
-```Squirrel
-if (FactoryTools.isFactoryImp()) {
-  configureFactoryImp();
-} else if (FactoryTools.isDeviceUnderTest()) {
-  configureDeviceUnderTest();
-} else {
-  server.log("Not running in Factory Environment");
-}
-```
-
-### onDeviceUnderTest(*callback*)
-
-This method registers a function which will be called when the device has received the required status information and is able to verify the host device’s type. The callback takes a single parameter, *result*, which will be `true` if the unit is a device under test, otherwise `false`.
+If a callback is provided, the function will be called when the device has received the required status information and is able to verify the host device’s type. The callback takes a single parameter, *result*, which will be `true` if the unit is a device under test, otherwise `false`.
 
 This method can also be used in your factory agent; the callback will simply be invoked immediately.
 
 ```squirrel
-FactoryTools.onFactoryImp(function(isBlinkUpBox) {
+FactoryTools.isFactoryImp(function(isBlinkUpBox) {
     if (isBlinkUpBox) {
         // Device is a factory imp - configure it
         configureFactoryImp();
     } else {
-        FactoryTools.onDeviceUnderTest(function(isDUT) {
-            if (isDUT) {
-                // Device is a production unit - test it
-                testDeviceUnderTest();
-            } else {
-                server.log("Not running in Factory Environment");
-            }
-        });
+        if (FactoryTools.isDeviceUnderTest()) {
+            // Device is a production unit - test it
+            testDeviceUnderTest();
+        } else {
+            server.log("Not running in Factory Environment");
+        }
     }
 });
 ```

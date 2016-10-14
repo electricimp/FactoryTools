@@ -61,16 +61,18 @@ if (imp.getssid() != SSID) {
 
 // Select the appropriate code path
 
-FactoryTools.onFactoryImp(function(isBlinkUpBox) {
+FactoryTools.isFactoryImp(function(isBlinkUpBox) {
+    // We are inside the callback; factory status information has been received
     if (isBlinkUpBox) {
+        // Device is a factory imp, so set it up
         fixture();
     } else {
-        FactoryTools.onDeviceUnderTest(function(isDUT) {
-            if (isDUT) {
-                pdevice();
-            } else {
-                server.log("Not running in Factory Environment");
-            }
-        });
+        // The next call need not be asynchronous because we know the status data has been received
+        // (the callback wouldn't have been called otherwise)
+        if (FactoryTools.isDeviceUnderTest()) {
+            pdevice();
+        } else {
+            server.log("Not running in Factory Environment");
+        }
     }
-});
+}.bindenv(this));
