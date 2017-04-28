@@ -1,7 +1,31 @@
+// MIT License
+
+// Copyright 2016 Electric Imp
+
+// SPDX-License-Identifier: MIT
+
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+
+// The above copyright notice and this permission notice shall be
+// included in all copies or substantial portions of the Software.
+
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO
+// EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
+// OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+// ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+// OTHER DEALINGS IN THE SOFTWARE.
+
 // Factory Fixture Display Driver
 #require "CFAx33KL.class.nut:1.0.1"
 // Factory Tools Utility Library
-#require "FactoryTools.class.nut:2.0.0"
+#require "FactoryTools.device.lib.nut:3.0.0"
 // LED Driver
 #require "WS2812.class.nut:2.0.1"
 
@@ -21,7 +45,8 @@ const MODEL = "FactoryExample" //max length of 16 char
 // ---------------------------------------
 
 // FACTORY FIXTURE CLASS
-// Hardware: Electric Imp's Factory BlinUp Box (https://electricimp.com/docs/manufacturing/factoryblinkupbox/)
+
+// Hardware: Electric Imp's impFactory BlinkUp Box (https://electricimp.com/docs/manufacturing/impfactory/)
 class BootFactoryFixture {
     // class variables (share a global name space with DUT so all values set within class)
     STATUS_RED_PIN = null;
@@ -50,7 +75,7 @@ class BootFactoryFixture {
     }
 
     function configureLCD() {
-        LCD = CFAx33KL(hardware.uart6E);
+        LCD = CFAx33KL(hardware.uart2);
         showDefaultLCD();
         LCD.storeCurrentStateAsBootState();
         LCD.setBrightness(100);
@@ -72,9 +97,9 @@ class BootFactoryFixture {
     }
 
     function configureLEDs() {
-        STATUS_RED_PIN = hardware.pin5;
-        STATUS_GRN_PIN = hardware.pin7;
-        BLINKUP_PIN = hardware.pinC;
+        STATUS_RED_PIN = hardware.pinF;
+        STATUS_GRN_PIN = hardware.pinE;
+        BLINKUP_PIN = hardware.pinM;
 
         STATUS_RED_PIN.configure(DIGITAL_OUT);
         STATUS_RED_PIN.write(0);
@@ -87,8 +112,8 @@ class BootFactoryFixture {
     }
 
     function configureBlinkupPins() {
-        BLINKUP_BTN_PIN = hardware.pinA;
-        FOOTSWITCH_PIN = hardware.pinB;
+        BLINKUP_BTN_PIN = hardware.pinC;
+        FOOTSWITCH_PIN = hardware.pinH;
     }
 
     function configureBlinkUpTrigger(pin) {
