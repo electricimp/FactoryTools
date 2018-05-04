@@ -1,5 +1,5 @@
 /**
-* Copyright (C) 2015-2016 Electric Imp, Inc
+* Copyright (C) 2015-2018 Electric Imp, Inc
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files
 * (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge,
 * publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do
@@ -18,12 +18,12 @@
 * @author Tony Smith <tony@electricimp.com>
 * @author Elizabeth Rhodes <betsy@electricimp.com>
 *
-* version 2.1.0
+* version 2.1.1
 */
 
 class FactoryTools {
 
-    static version = [2,1,0];
+    static version = [2,1,1];
 
     /**
     * @return {bool} - 'true' or 'false'
@@ -54,13 +54,20 @@ class FactoryTools {
                 return (isFactoryFirmware() && !isDeviceUnderTest());
             }
         } else {
+            // Check the fixture MAC address all the possible device MAC addresses
+            local got = false;
+            local i = imp.net.info();
+            foreach (item in i.interface) {
+                if ("factory_imp" in imp.configparams && imp.configparams.factory_imp == item.macaddress) got = true;
+            }
+
             if (callback) {
                 imp.onidle(function() {
                     imp.onidle(null);
-                    callback(isFactoryFirmware() && "factory_imp" in imp.configparams && imp.configparams.factory_imp == imp.getmacaddress());
+                    callback(isFactoryFirmware() && got);
                 }.bindenv(this));
             } else {
-                return (isFactoryFirmware() && "factory_imp" in imp.configparams && imp.configparams.factory_imp == imp.getmacaddress());
+                return (isFactoryFirmware() && got);
             }
         }
     }
