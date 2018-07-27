@@ -1,7 +1,7 @@
 // Factory Fixture Display Driver
 #require "CFAx33KL.class.nut:1.0.1"
 // Factory Tools Utility Library
-#require "FactoryTools.class.nut:2.2.0"
+#require "FactoryTools.lib.nut:2.2.0"
 // LED Driver
 #require "HTS221.device.lib.nut:2.0.1"
 

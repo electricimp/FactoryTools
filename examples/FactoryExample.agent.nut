@@ -1,5 +1,5 @@
 // Factory Tools Utility Library
-#require "FactoryTools.class.nut:2.2.0"
+#require "FactoryTools.lib.nut:2.2.0"
 
 
 // SHARED SETUP
