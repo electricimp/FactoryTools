@@ -259,7 +259,7 @@ FactoryTools.isFactoryFirmware(function(inFactory) {
     if (inFactory) {
         server.log("This device is running factory firmware");
         // Run Class Code for Specified Device
-        if (FactoryTools.isFactoryImp()) {
+        if (FactoryTools.isFactoryFixture()) {
             server.log("This device is a BlinkUp fixture");
             BootFactoryFixture();
         }

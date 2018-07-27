@@ -1,26 +1,26 @@
-# Factory Code Example
+# Factory Code Example ##
 
-## This Example shows how to
+## This Example shows how to ##
 
 * Use the Factory Tools library to determine if we are running in a factory environment.
-* Use the Factory Fixture (Purple Box) IR output to bless devices.
-* Run a test before blessing.
-* Use factory agents to deliver device information from the Device Under Test to an external webhook and also back to the Factory Fixture (Purple Box) to display on the Fixture's LCD display.
-* Use the "exit" button to reset the LCD display to welcome message.
+* Use the BlinkUp fixture (impFactory™) IR output to configure device under test (DUT).
+* Run a test on DUT before blessing.
+* Use agent to deliver device information from the DUT to an external webhook and also back to the BlinkUp fixture to display on the fixture's LCD display.
+* Use the **Exit** button to reset the LCD display to welcome message.
 
-## Hardware Used
+## Hardware Used ##
 
 * Blinkup Fixture:
-[Electric Imp's Factory BlinkUp Box](https://store.electricimp.com/collections/featured-products/products/impfactory?variant=31163225426)
+[Electric Imp's impFactory](https://store.electricimp.com/collections/featured-products/products/impfactory?variant=31163225426)
 * Device Under Test:
 [Explorer Kit](https://store.electricimp.com/collections/featured-products/products/impexplorer-developer-kit?variant=31118866130)
-  * Imp001 & impExplorer Developer Kit
+  * imp001 & impExplorer™ Developer Kit
 
-## SetUp Instructions
+## Setup Instructions ##
 
-These instructions will not go into detail on the Imp manufacturing process. Please look at the documentation on the [Dev Center](https://developer.electricimp.com/manufacturing/factoryguide) for details on manufacturing.
+These instructions will not go into detail on the Electric Imp Connected Factory Process. Please look at the documentation on the [Dev Center](https://developer.electricimp.com/manufacturing/factoryguide) for details on manufacturing.
 
-Select your device code: asynchronous or synchronous (synchronous is fine if your factory has a stable wifi connection, otherwise use the asynchronous code). The agent code will work with either device file. Copy and paste the agent and device code into your factory device group.
+Select your device code: asynchronous or synchronous (synchronous is fine if your factory has a stable WiFi connection, otherwise use the asynchronous code. The agent code will work with either device file. Copy and paste the agent and device code into your Factory Test Device Group.
 
-Enter your WEBHOOK_URL into the constant in the agent code, and enter your WiFi network's SSID and PASSWORD into constants in the device code. For webhook setup see this [example](https://developer.electricimp.com/manufacturing/webhooksexample).
+Enter your webhook URL into the constant provided in the agent code, and enter your WiFi network's SSID and password into the constants provided in the device code. For webhook setup see this [example](https://developer.electricimp.com/manufacturing/webhooksexample).
 

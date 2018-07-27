@@ -110,7 +110,7 @@ if (FactoryTools.isFactoryFirmware()) {
     server.log("This agent is running factory firmware");
 
     // Run Class Code for Specified Device
-    if (FactoryTools.isFactoryImp()) {
+    if (FactoryTools.isFactoryFixture()) {
         server.log("Its device is a BlinkUp fixture");
         BootFactoryFixtureAgent();
     }
