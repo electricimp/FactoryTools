@@ -37,15 +37,15 @@ class FactoryTools {
     static function isFactoryFirmware(callback = null) {
         if (callback) {
             if (_isAgent()) {
-                callback(_isFF());
+                callback(_isFFirm());
             } else {
                 // Wait for imp.configparams table to populate before checking
                 imp.onidle(function() {
-                    callback(_isFF());
+                    callback(_isFFirm());
                 }.bindenv(this));
             }
         } else {
-            return _isFF();
+            return _isFFirm();
         }
     }
 
@@ -61,17 +61,17 @@ class FactoryTools {
     static function isFactoryFixture(callback = null) {
         if (_isAgent()) {
             // Checks that Factory Fixture URL is not in imp.configparams
-            local isFI = _isFF() && !isDeviceUnderTest();
-            (callback) ? callback(isFI) : return isFI;
+            local isFixture = _isFFirm() && !_isDUT();
+            (callback) ? callback(isFixture) : return isFixture;
         } else {
             // Checks if imp.configparams.factory_imp mac matches this imp's mac address
             if (callback) {
                 // Wait for imp.configparams table to populate before checking
                 imp.onidle(function() {
-                    callback(_isFF() && _isFI());
+                    callback(_isFFirm() && _isFFix());
                 }.bindenv(this));
             } else {
-                return (_isFF() && _isFI());
+                return (_isFFirm() && _isFFix());
             }
         }
     }
@@ -96,17 +96,17 @@ class FactoryTools {
     static function isDeviceUnderTest(callback = null) {
         if (_isAgent()) {
             // Checks that Factory Fixture URL is in imp.configparams
-            local isDUT = (_isFF() && "factory_fixture_url" in imp.configparams);
+            local isDUT = (_isFFirm() && _isDUT());
             (callback) ? callback(isDUT) : return isDUT;
         } else {
             // Checks if that imp.configparams.factory_imp mac doesn't match this imp's mac address
             if (callback) {
                 // Wait for imp.configparams table to populate before checking
                 imp.onidle(function() {
-                    callback(_isFF() && !_isFI());
+                    callback(_isFFirm() && !_isFFix());
                 }.bindenv(this));
             } else {
-                return (_isFF() && !_isFI());
+                return (_isFFirm() && !_isFFix());
             }
         }
     }
@@ -117,7 +117,7 @@ class FactoryTools {
     */
     static function getFactoryFixtureURL() {
         if (_isAgent() && isFactoryFirmware()) {
-            return ("factory_fixture_url" in imp.configparams) ? imp.configparams.factory_fixture_url : http.agenturl();
+            return (_isDUT()) ? imp.configparams.factory_fixture_url : http.agenturl();
         }
 
         return null;
@@ -134,29 +134,38 @@ class FactoryTools {
     /**
     * Private method
     * @return {bool} - if imp.configparams factoryfirmware is true
-    */ 
-    function _isFF() {
+    */
+    function _isFFirm() {
         return ("factoryfirmware" in imp.configparams && imp.configparams["factoryfirmware"]);
     }
 
     /**
-    * Private method
+    * Private method - Device only
     * @return {bool} - if imp.configparams factory_imp mac matches device mac
-    */ 
-    function _isFI() {
+    */
+    function _isFFix() {
         return ("factory_imp" in imp.configparams && imp.configparams.factory_imp == _getMacAddr());
     }
 
     /**
-    * Private method
+    * Private method - Agent only
+    * @return {bool} - if factory_fixture_url is in imp.configparams
+    */
+    function _isDUT() {
+        return ("factory_fixture_url" in imp.configparams);
+    }
+
+    /**
+    * Private method - Device only
     * @return {string} - the mac address of the imp
     */
     function _getMacAddr() {
-        // NOTE With addition of cellular and ethernet - imp mac addresses 
-        // are not as straightforward to match with the mac address in 
-        // imp.configparams. For all imps other than imp001 - use device 
-        // Id to determine the mac address. For imp001 use the imp.net.info
-        // table to look up the wifi mac address.
+        // NOTE: The mac address used to identify the Factory Fixture
+        // is the WiFi mac address for that imp. For all WiFi imps
+        // except the imp001 the device address is based off the mac
+        // address. For compatibility with cellular and ethernet this
+        // method will use the Device ID to infer the mac address. For
+        // imp001 the mac address in the imp.net.info will be returned.
         if (imp.info().type != "imp001") {
             local devID = hardware.getdeviceid();
             return devID.slice(4);
