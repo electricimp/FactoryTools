@@ -16,7 +16,7 @@ If your factory firmware puts production devices under test (DUT) into deep slee
 
 To avoid this issue, you should make use of Factory Tools 2.2.0’s support for asynchronous operation. The methods *isFactoryFirmware()*, *isFactoryImp()* and *isDeviceUnderTest()* can now take an optional callback function with a single parameter, *result*, into which the boolean answer is placed. For example a callback registered with *isFactoryImp()* will receive `true` if the device is a BlinkUp fixture, or `false` if it is a device under test.
 
-In each case, embed your BlinkUp fixture set-up flow and DUT test flow within the callbacks to ensure these flows are actioned correctly. Examples are given in the method descriptions below. It also demonstrated in the accompanying example, `Async.factory.device.nut`.
+In each case, embed your BlinkUp fixture set-up flow and DUT test flow within the callbacks to ensure these flows are actioned correctly. Examples are given in the method descriptions below. It also demonstrated in the accompanying example, `FactoryExampleAsync.device.nut`.
 
 You only need employ asynchronous operation on **the first call** to one of Factory Tools’ methods. Once the first callback has been executed, you can be sure the status information is present, and all other calls can be made synchronously without penalty.
 
