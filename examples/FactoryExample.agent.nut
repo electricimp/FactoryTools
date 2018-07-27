@@ -39,7 +39,7 @@ class BootFactoryFixtureAgent {
     function handleDUTPostReq() {
         http.onrequest(function(req, res) {
             try {
-                if(req.method == "POST" && req.body) {
+                if (req.method == "POST" && req.body) {
                     local data = http.jsondecode(req.body);
                     device.send("DutDevInfo", data);
                     res.send(200, "OK");
@@ -91,7 +91,7 @@ class BootDeviceUnderTestAgent {
         local headers = { "Content-Type":"application/json" };
         local body = http.jsonencode(result);
         http.post(fixtureAgentURL, headers, body).sendasync(function(response) {
-            if(response.statuscode != 200) {
+            if (response.statuscode != 200) {
                 server.error("Problem contacting fixture");
             } else {
                 server.log("Factory fixture confirmed receipt of DUT info.");
