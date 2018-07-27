@@ -1,10 +1,10 @@
 // Factory Tools Utility Library
-#require "FactoryTools.class.nut:2.0.0"
+#require "FactoryTools.class.nut:2.2.0"
 
 
 // SHARED SETUP
 // ---------------------------------------
-const webhookURL = "<YOUR WEBHOOK's BASEURL>";
+const WEBHOOK_URL = "<YOUR WEBHOOK's BASEURL>";
 
 
 // AGENT CLASSES
@@ -19,8 +19,8 @@ class BootFactoryFixtureAgent {
     }
 
     function sendTestResultToDB(result) {
-        // send result to webhook backend
-        local url = webhookURL + "/testresult.json";
+        // Send result to webhook backend
+        local url = WEBHOOK_URL + "/testresult.json";
         local headers = { "Content-Type":"application/json" };
         local body = http.jsonencode(result);
         local deviceid = imp.configparams.deviceid;
@@ -41,7 +41,7 @@ class BootFactoryFixtureAgent {
             try {
                 if(req.method == "POST" && req.body) {
                     local data = http.jsondecode(req.body);
-                    device.send("DUT_devInfo", data);
+                    device.send("DutDevInfo", data);
                     res.send(200, "OK");
                 }
             } catch (err) {
@@ -63,8 +63,8 @@ class BootDeviceUnderTestAgent {
     }
 
     function sendTestResultToDB(result) {
-        // send result to webhook backend
-        local url = webhookURL + "/testresult.json";
+        // Send result to webhook backend
+        local url = WEBHOOK_URL + "/testresult.json";
         local headers = { "Content-Type":"application/json" };
         local body = http.jsonencode(result);
         local deviceid = imp.configparams.deviceid;
@@ -82,28 +82,21 @@ class BootDeviceUnderTestAgent {
 
     function sendDeviceInfoToFactoryFixture(result) {
         local fixtureAgentURL = FactoryTools.getFactoryFixtureURL();
-        local headers = { "Content-Type":"application/json" };
-        local body;
 
-        if(fixtureAgentURL == null) {
+        if (fixtureAgentURL == null) {
             server.error("Factory Fixture URL Not Available.");
             return;
         }
 
-        if(result.success) {
-            body = http.jsonencode(result.deviceInfo);
-        } else {
-            body = http.jsonencode({"success": result.success});
-        }
-
-        local request = http.post(fixtureAgentURL, headers, body);
-        local response = request.sendsync();
-
-        if(response.statuscode != 200) {
-            server.error("Problem contacting fixture");
-        } else {
-            server.log("Factory fixture confirmed receipt of DUT info.");
-        }
+        local headers = { "Content-Type":"application/json" };
+        local body = http.jsonencode(result);
+        http.post(fixtureAgentURL, headers, body).sendasync(function(response) {
+            if(response.statuscode != 200) {
+                server.error("Problem contacting fixture");
+            } else {
+                server.log("Factory fixture confirmed receipt of DUT info.");
+            }
+        }.bindenv(this));
     }
 }
 

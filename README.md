@@ -7,14 +7,14 @@ These utilities are provided to simplify building and maintaining factory firmwa
 Simply `#require` this library on either your device or agent side code in order to gain access to the methods listed below. Methods are namespaced to "FactoryTools".
 
 ```Squirrel
-#require "FactoryTools.class.nut:2.1.1"
+#require "FactoryTools.class.nut:2.2.0"
 ```
 
 ### Waking Devices Under Test From Deep Sleep ###
 
 If your factory firmware puts production devices under test (DUT) into deep sleep, when the devices awake (ie. perform a warm start) they will immediately begin re-running the factory firmware. This is standard imp wake-from-sleep behavior. Unfortunately, this also means that you factory firmware may call the Factory Tools methods before the device has received the information from the server it needs to be able to return valid data via the Factory Tools methods. The factory firmware will erroneously believe that it is not running in a factory environment.
 
-To avoid this issue, you should make use of Factory Tools 2.1.1’s new support for asynchronous operation. The methods *isFactoryFirmware()*, *isFactoryImp()* and *isDeviceUnderTest()* can now take an optional callback function with a single parameter, *result*, into which the boolean answer is placed. For example, a callback registered with *isFactoryImp()* will receive `true` if the device is a factory imp, or `false` if it is a device under test.
+To avoid this issue, you should make use of Factory Tools 2.2.0’s new support for asynchronous operation. The methods *isFactoryFirmware()*, *isFactoryImp()* and *isDeviceUnderTest()* can now take an optional callback function with a single parameter, *result*, into which the boolean answer is placed. For example, a callback registered with *isFactoryImp()* will receive `true` if the device is a factory imp, or `false` if it is a device under test.
 
 In each case, embed your factory imp set-up flow and DUT test flow within the callbacks to ensure these flows are actioned correctly. An example is given in the method descriptions below. It also demonstrated in the accompanying example, `Async.factory.device.nut`.
 
@@ -26,7 +26,8 @@ Asynchronous functionality does not impact synchronous operation, so existing co
 
 ## Release Notes ##
 
-- 2.1.1
+- 2.2.0
+    - Support cellular by infering mac address based on the Device Id for all imp's except the 001.
     - Switch to non-deprecated imp API methods (imp.net.info())
 
 ## Methods ##
