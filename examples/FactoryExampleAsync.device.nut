@@ -1,10 +1,9 @@
-// Factory Fixture Display Driver
-#require "CFAx33KL.class.nut:1.0.1"
 // Factory Tools Utility Library
 #require "FactoryTools.lib.nut:2.2.0"
+// Factory Fixture Display Driver
+#require "CFAx33KL.device.lib.nut:2.0.0"
 // LED Driver
 #require "HTS221.device.lib.nut:2.0.1"
-
 
 
 // SHARED DEVICE SETUP
@@ -25,7 +24,7 @@ class BootFactoryFixture {
     // must happen in the class.
 
     //max length of 16 char
-    static FIXTURE_BANNER = "FactoryExample";
+    static FIXTURE_BANNER = "Factory Example";
 
     // How long to wait (seconds) after triggering BlinkUp before allowing another
     static BLINKUP_TIME = 10;
@@ -37,9 +36,9 @@ class BootFactoryFixture {
     // Flag used to prevent new BlinkUp triggers while BlinkUp is running
     sendingBlinkUp = null;
 
-
     constructor() {
         imp.enableblinkup(true);
+        sendingBlinkUp = false;
 
         // Factory Fixture 005 HAL
         fixture = {
@@ -80,8 +79,11 @@ class BootFactoryFixture {
 
     function configureLCDResetKey() {
         lcd.onKeyEvent(function(event) {
-            if (event == lcd.KEY_EXIT_PRESS) {
+            if (event == CFAx33KL_KEY_EXIT_RELEASE) {
                 setDefaultDisplay();
+                // Turn LEDs off
+                fixture.LED_GREEN.write(0);
+                fixture.LED_RED.write(0);
             }
         }.bindenv(this));
     }
@@ -93,24 +95,19 @@ class BootFactoryFixture {
     }
 
     function configureBlinkUpTrigger(pin) {
-        pin.configure(DIGITAL_IN, createBlinkUpTriggerCB(pin));
+        pin.configure(DIGITAL_IN, createBlinkUpTriggerCB(pin).bindenv(this));
     }
 
     // Return a Blinkup callback for pin
     function createBlinkUpTriggerCB(pin) {
         return function() {
-            local status = pin.read();
-
             // Toggle green LED with button press
-            if(status) {
-                STATUS_GRN_PIN.write(0);
-                return;
-            }
-
-            // Send BlinkUp
-            if (status && !sendingBlinkUp) {
-                STATUS_GRN_PIN.write(1);
-                sendBlinkUp();
+            if (pin.read()) {
+                fixture.LED_GREEN.write(1);
+            } else {
+                fixture.LED_GREEN.write(0);
+                // Send BlinkUp
+                if (!sendingBlinkUp) sendBlinkUp();
             }
         }.bindenv(this);
     }
@@ -158,6 +155,11 @@ class BootFactoryFixture {
         }
         if ("success" in results) {
             lcd.setLine2("Passed = " + results.success);
+            if (results.success) {
+                fixture.LED_GREEN.write(1);
+            } else {
+                fixture.LED_RED.write(1);
+            }
         } else {
             lcd.setLine2("No results");
             server.log("No test results in data.");
@@ -236,19 +238,17 @@ class BootDeviceUnderTest {
 
             local testResult = {
                 "deviceInfo" : {
-                    "device_id" : hardware.getdeviceid()
+                    "deviceId" : hardware.getdeviceid()
                 },
                 "ts" : time(),
                 "success" : blessSuccess
             };
 
-            server.log("Blessing " + (blessSuccess ? "PASSED" : "FAILED") + " for device " + deviceInfo.device_id);
+            server.log("Blessing " + (blessSuccess ? "PASSED" : "FAILED") + " for device " + testResult.deviceInfo.deviceId);
             agent.send("testresult", testResult);
         });
     }
 }
-
-
 
 // RUNTIME CODE
 // ---------------------------------------

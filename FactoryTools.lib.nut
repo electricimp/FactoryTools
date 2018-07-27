@@ -61,8 +61,12 @@ class FactoryTools {
     static function isFactoryFixture(callback = null) {
         if (_isAgent()) {
             // Checks that Factory Fixture URL is not in imp.configparams
-            local isFixture = _isFFirm() && !_isDUT();
-            (callback) ? callback(isFixture) : return isFixture;
+            local isFixture = (_isFFirm() && !_isDUT());
+            if (callback) {
+                callback(isFixture);
+            } else {
+                return isFixture;
+            }
         } else {
             // Checks if imp.configparams.factory_imp mac matches this imp's mac address
             if (callback) {
@@ -81,7 +85,7 @@ class FactoryTools {
       but the method is retained for backwards compatibility
     */
     static function isFactoryImp(callback = null) {
-        isFactoryFixture(callback);
+        return isFactoryFixture(callback);
     }
 
     /**
@@ -97,7 +101,11 @@ class FactoryTools {
         if (_isAgent()) {
             // Checks that Factory Fixture URL is in imp.configparams
             local isDUT = (_isFFirm() && _isDUT());
-            (callback) ? callback(isDUT) : return isDUT;
+            if (callback) {
+                callback(isDUT);
+            } else {
+                return isDUT;
+            }
         } else {
             // Checks if that imp.configparams.factory_imp mac doesn't match this imp's mac address
             if (callback) {

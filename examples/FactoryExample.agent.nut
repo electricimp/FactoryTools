@@ -25,12 +25,12 @@ class BootFactoryFixtureAgent {
         local body = http.jsonencode(result);
         local deviceid = imp.configparams.deviceid;
 
-        server.log(format("posting testresults for device %s:%s", deviceid, body));
+        server.log(format("Posting testresults for device %s : %s", deviceid, body));
 
         http.post(url, headers, body).sendasync(function (response) {
             if (response.statuscode >= 300) {
                 server.error(format(
-                    "failed posting testresults for device %s with status code %d:%s",
+                    "Failed posting testresults for device %s with status code %d : %s",
                     deviceid, response.statuscode, response.body));
             }
         });
@@ -41,6 +41,7 @@ class BootFactoryFixtureAgent {
             try {
                 if (req.method == "POST" && req.body) {
                     local data = http.jsondecode(req.body);
+                    server.log("Sending device results to display.");
                     device.send("DutDevInfo", data);
                     res.send(200, "OK");
                 }
@@ -69,12 +70,12 @@ class BootDeviceUnderTestAgent {
         local body = http.jsonencode(result);
         local deviceid = imp.configparams.deviceid;
 
-        server.log(format("posting testresults for device %s:%s", deviceid, body));
+        server.log(format("Posting testresults for device %s : %s", deviceid, body));
 
         http.post(url, headers, body).sendasync(function (response) {
             if (response.statuscode >= 300) {
                 server.error(format(
-                    "failed posting testresults for device %s with status code %d:%s",
+                    "Failed posting testresults for device %s with status code %d : %s",
                     deviceid, response.statuscode, response.body));
             }
         });
