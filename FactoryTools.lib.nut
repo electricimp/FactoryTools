@@ -58,7 +58,7 @@ class FactoryTools {
     * Returns:
     *   bool (if no callback provided) or null (if callback is provided - bool is passed to callback)
     */
-    static function isFactoryImp(callback = null) {
+    static function isFactoryFixture(callback = null) {
         if (_isAgent()) {
             // Checks that Factory Fixture URL is not in imp.configparams
             local isFI = _isFF() && !isDeviceUnderTest();
@@ -74,6 +74,14 @@ class FactoryTools {
                 return (_isFF() && _isFI());
             }
         }
+    }
+
+    /**
+    * Compatibility call. Factory imps are not used in impCentral, so we have deprecated isFactioryImp(),
+      but the method is retained for backwards compatibility
+    */
+    static function isFactoryImp(callback = null) {
+        isFactoryFixture(callback);
     }
 
     /**
@@ -144,7 +152,7 @@ class FactoryTools {
     * @return {string} - the mac address of the imp
     */
     function _getMacAddr() {
-        // Note: With addition of cellular and ethernet - imp mac addresses 
+        // NOTE With addition of cellular and ethernet - imp mac addresses 
         // are not as straightforward to match with the mac address in 
         // imp.configparams. For all imps other than imp001 - use device 
         // Id to determine the mac address. For imp001 use the imp.net.info
