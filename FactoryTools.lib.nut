@@ -18,7 +18,6 @@
 * @author Tony Smith <tony@electricimp.com>
 * @author Elizabeth Rhodes <betsy@electricimp.com>
 *
-* version 2.2.0
 */
 
 class FactoryTools {
