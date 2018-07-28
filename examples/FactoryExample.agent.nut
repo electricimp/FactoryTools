@@ -1,10 +1,10 @@
 // Factory Tools Utility Library
-#require "FactoryTools.class.nut:2.0.0"
+#require "FactoryTools.lib.nut:2.2.0"
 
 
 // SHARED SETUP
 // ---------------------------------------
-const webhookURL = "<YOUR WEBHOOK's BASEURL>";
+const WEBHOOK_URL = "<YOUR WEBHOOK's BASEURL>";
 
 
 // AGENT CLASSES
@@ -19,18 +19,18 @@ class BootFactoryFixtureAgent {
     }
 
     function sendTestResultToDB(result) {
-        // send result to webhook backend
-        local url = webhookURL + "/testresult.json";
+        // Send result to webhook backend
+        local url = WEBHOOK_URL + "/testresult.json";
         local headers = { "Content-Type":"application/json" };
         local body = http.jsonencode(result);
         local deviceid = imp.configparams.deviceid;
 
-        server.log(format("posting testresults for device %s:%s", deviceid, body));
+        server.log(format("Posting testresults for device %s : %s", deviceid, body));
 
         http.post(url, headers, body).sendasync(function (response) {
             if (response.statuscode >= 300) {
                 server.error(format(
-                    "failed posting testresults for device %s with status code %d:%s",
+                    "Failed posting testresults for device %s with status code %d : %s",
                     deviceid, response.statuscode, response.body));
             }
         });
@@ -39,9 +39,10 @@ class BootFactoryFixtureAgent {
     function handleDUTPostReq() {
         http.onrequest(function(req, res) {
             try {
-                if(req.method == "POST" && req.body) {
+                if (req.method == "POST" && req.body) {
                     local data = http.jsondecode(req.body);
-                    device.send("DUT_devInfo", data);
+                    server.log("Sending device results to display.");
+                    device.send("DutDevInfo", data);
                     res.send(200, "OK");
                 }
             } catch (err) {
@@ -63,18 +64,18 @@ class BootDeviceUnderTestAgent {
     }
 
     function sendTestResultToDB(result) {
-        // send result to webhook backend
-        local url = webhookURL + "/testresult.json";
+        // Send result to webhook backend
+        local url = WEBHOOK_URL + "/testresult.json";
         local headers = { "Content-Type":"application/json" };
         local body = http.jsonencode(result);
         local deviceid = imp.configparams.deviceid;
 
-        server.log(format("posting testresults for device %s:%s", deviceid, body));
+        server.log(format("Posting testresults for device %s : %s", deviceid, body));
 
         http.post(url, headers, body).sendasync(function (response) {
             if (response.statuscode >= 300) {
                 server.error(format(
-                    "failed posting testresults for device %s with status code %d:%s",
+                    "Failed posting testresults for device %s with status code %d : %s",
                     deviceid, response.statuscode, response.body));
             }
         });
@@ -82,28 +83,21 @@ class BootDeviceUnderTestAgent {
 
     function sendDeviceInfoToFactoryFixture(result) {
         local fixtureAgentURL = FactoryTools.getFactoryFixtureURL();
-        local headers = { "Content-Type":"application/json" };
-        local body;
 
-        if(fixtureAgentURL == null) {
+        if (fixtureAgentURL == null) {
             server.error("Factory Fixture URL Not Available.");
             return;
         }
 
-        if(result.success) {
-            body = http.jsonencode(result.deviceInfo);
-        } else {
-            body = http.jsonencode({"success": result.success});
-        }
-
-        local request = http.post(fixtureAgentURL, headers, body);
-        local response = request.sendsync();
-
-        if(response.statuscode != 200) {
-            server.error("Problem contacting fixture");
-        } else {
-            server.log("Factory fixture confirmed receipt of DUT info.");
-        }
+        local headers = { "Content-Type":"application/json" };
+        local body = http.jsonencode(result);
+        http.post(fixtureAgentURL, headers, body).sendasync(function(response) {
+            if (response.statuscode != 200) {
+                server.error("Problem contacting fixture");
+            } else {
+                server.log("Factory fixture confirmed receipt of DUT info.");
+            }
+        }.bindenv(this));
     }
 }
 
@@ -117,7 +111,7 @@ if (FactoryTools.isFactoryFirmware()) {
     server.log("This agent is running factory firmware");
 
     // Run Class Code for Specified Device
-    if (FactoryTools.isFactoryImp()) {
+    if (FactoryTools.isFactoryFixture()) {
         server.log("Its device is a BlinkUp fixture");
         BootFactoryFixtureAgent();
     }
