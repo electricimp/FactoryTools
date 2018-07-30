@@ -61,11 +61,13 @@ If a callback is provided, the function will be called when the device has recei
 
 The callback can also be used in your factory agent; it will simply be invoked immediately.
 
+#### Example ####
+
 ```squirrel
-FactoryTools.isFactoryImp(function(isBlinkUpBox) {
+FactoryTools.isFactoryFixture(function(isBlinkUpBox) {
   if (isBlinkUpBox) {
       // Device is a factory imp
-      configureFactoryImp();
+      configureFactoryFixture();
   } else {
     // The next call need not be asynchronous since we can be sure
     // at this point (we're executing in a callback) that the status
@@ -90,11 +92,12 @@ If a callback is provided, the function will be called when the device has recei
 
 The callback can also be used in your agent; it will simply be invoked immediately.
 
+#### Example ####
 ```squirrel
-FactoryTools.isFactoryImp(function(isBlinkUpBox) {
+FactoryTools.isFactoryFixture(function(isBlinkUpBox) {
   if (isBlinkUpBox) {
     // Device is a factory imp - configure it
-    configureFactoryImp();
+    configureFactoryFixture();
   } else {
     if (FactoryTools.isDeviceUnderTest()) {
       // Device is a production unit - test it
@@ -111,6 +114,8 @@ FactoryTools.isFactoryImp(function(isBlinkUpBox) {
 Supported on the agent *only*. If called on the device this method will return `null`.
 
 If the firmware is running as an agent within the factory environment, this method returns the BlinkUp fixture’s agent URL. Otherwise it returns `null`. You can use this agent URL to send information about the device under test to the BlinkUp fixture using an HTTP request. There is no asynchronous operation option.
+
+#### Example ####
 
 ```Squirrel
 device.on("testresult", function(result) {
